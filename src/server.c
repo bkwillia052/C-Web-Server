@@ -58,7 +58,20 @@ int send_response(int fd, char *header, char *content_type, void *body, int cont
     ///////////////////
     // IMPLEMENT ME! //
     ///////////////////
+    int response_length = 0;
+    time_t rawtime;
+    struct tm *timeinfo;
 
+    time(&rawtime);
+
+    timeinfo = localtime(&rawtime);
+
+    // Build HTTP response and store it in response
+    response_length = sprintf(response, "%s\nConnection: close\nContent-Length: %d\nContent-Type: %s\nDate: %s\n", header, content_length, content_type, asctime(timeinfo));
+
+    memcpy(response+response_length, body, content_length);
+
+    response_length += content_length;
     // Send it all!
     int rv = send(fd, response, response_length, 0);
 
@@ -157,9 +170,9 @@ void handle_http_request(int fd, struct cache *cache)
     ///////////////////
     // IMPLEMENT ME! //
     ///////////////////
-
+  
     // Read the first two components of the first line of the request 
- 
+    //printf("Request %s\n", request)
     // If GET, handle the get endpoints
 
     //    Check if it's /d20 and handle that special case
@@ -189,7 +202,7 @@ int main(void)
     }
 
     printf("webserver: waiting for connections on port %s...\n", PORT);
-
+    
     // This is the main loop that accepts incoming connections and
     // responds to the request. The main parent process
     // then goes back to waiting for new connections.
@@ -213,7 +226,7 @@ int main(void)
         
         // newfd is a new socket descriptor for the new connection.
         // listenfd is still listening for new connections.
-
+        resp_404(newfd);
         handle_http_request(newfd, cache);
 
         close(newfd);
