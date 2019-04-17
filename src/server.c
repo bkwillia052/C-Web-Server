@@ -272,8 +272,8 @@ int main(void)
         
         // newfd is a new socket descriptor for the new connection.
         // listenfd is still listening for new connections.
-        resp_404(newfd);
-        send_response(newfd, "HTTP/1.1 200 OK", mime_type, filedata->data, filedata->size);
+        
+        
         handle_http_request(newfd, cache);
 
         close(newfd);
