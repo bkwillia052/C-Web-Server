@@ -30,6 +30,7 @@ void free_entry(struct cache_entry *entry)
     ///////////////////
     // IMPLEMENT ME! //
     ///////////////////
+    free(entry);
 }
 
 /**
@@ -102,6 +103,17 @@ struct cache *cache_create(int max_size, int hashsize)
     ///////////////////
     // IMPLEMENT ME! //
     ///////////////////
+    
+    struct cache *new_cache = malloc(sizeof(struct cache));
+    struct hashtable *hash_table = hashtable_create(hashsize, NULL);
+
+    new_cache->head = NULL;
+    new_cache->tail = NULL;
+    new_cache->cur_size = 0;
+    new_cache->max_size = max_size;
+    new_cache->index = hash_table;
+
+    return new_cache;
 }
 
 void cache_free(struct cache *cache)
@@ -154,4 +166,11 @@ struct cache_entry *cache_get(struct cache *cache, char *path)
     ///////////////////
     // IMPLEMENT ME! //
     ///////////////////
+    struct cache_entry *get_entry = hashtable_get(cache->index, path);
+    if (get_entry == NULL) {
+        return NULL;
+    } else {
+        dllist_move_to_head(cache, get_entry);
+        return get_entry;
+    }
 }
